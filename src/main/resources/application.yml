@@ -1,0 +1,9 @@
+
+spring:
+  r2dbc:
+    url: r2dbc:oracle://localhost:1521:xe
+    username: DEV_OWNER
+    password: welcome1
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
