@@ -3,28 +3,31 @@ package br.com.innowise.userapi.service;
 
 import br.com.innowise.userapi.dto.UserDto;
 import br.com.innowise.userapi.model.User;
+import br.com.innowise.userapi.repository.CustomUserRepository;
 import br.com.innowise.userapi.repository.UserRepository;
 import br.com.innowise.userapi.utils.UserUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+
+    private final UserRepository userRepository;
+    private final CustomUserRepository customUserRepository;
 
 
     @Override
     public Mono<User> create(Mono<UserDto> userDto) {
-        return userDto.map(UserUtils::toUser).flatMap(userRepository::save);
+        return userDto.map(UserUtils::toUser).flatMap(customUserRepository::save);
     }
 
     @Override
     public Mono<User> retrieve(int userId) {
-        return userRepository.findById(userId);
+        return customUserRepository.findById(userId);
     }
 
     @Override
@@ -33,16 +36,16 @@ public class UserServiceImpl implements UserService {
                 .flatMap(user -> userDto
                         .map(UserUtils::toUser)
                         .doOnNext(u -> u.setId(userId)))
-                .flatMap(userRepository::save);
+                .flatMap(customUserRepository::update);
     }
 
     @Override
     public Mono<Void> delete(int userId) {
-        return userRepository.deleteById(userId);
+        return customUserRepository.deleteById(userId);
     }
 
     @Override
     public Flux<User> list() {
-        return userRepository.findAll();
+        return customUserRepository.findAll();
     }
 }
